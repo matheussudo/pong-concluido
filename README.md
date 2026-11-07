@@ -27,6 +27,7 @@ Principais conceitos aplicados:
 | `Raquete` | Modela o estado e o comportamento das raquetes (jogador e CPU), encapsulando posicao, dimensoes, velocidade, limites verticais e area de colisao. |
 | `Bola` | Controla coordenadas, deslocamento horizontal/vertical, progressao gradual de velocidade a cada rebote, inversao de direcao e reposicionamento centralizado apos cada ponto. |
 | `Placar` | Gerencia a pontuacao do jogador e do computador de forma isolada, fornecendo metodos para contabilizar pontos e reiniciar a contagem. |
+| `TesteJogo` | Suite de testes automatizados que verifica movimentacao, limites do campo, colisoes, encapsulamento do placar e progressao de velocidade por dificuldade. |
 
 ---
 
@@ -96,15 +97,37 @@ java Main
 
 ---
 
+## Testes Automatizados e Registro de Verificacao
+
+O projeto conta com a classe `TesteJogo.java` e o script `executar_testes.sh` para validar de forma automatizada as regras de negocio exigidas nas fases do roteiro (limites das raquetes, centralizacao e inversao da bola, intersecao de retangulos de colisao, encapsulamento do placar e progressao de velocidade nos niveis Facil, Medio e Dificil).
+
+Para executar a suite de testes no terminal:
+
+```bash
+chmod +x executar_testes.sh
+./executar_testes.sh
+```
+
+Ou diretamente com o Java:
+
+```bash
+javac -encoding UTF-8 *.java
+java TesteJogo
+```
+
+---
+
 ## Estrutura de Arquivos
 
 ```text
 .
-├── Main.java         # Inicializacao da aplicacao na thread de eventos do Swing
-├── JanelaJogo.java   # Configuracao do JFrame e empacotamento do painel
-├── CampoJogo.java    # Loop principal, eventos de teclado, IA, colisoes e pintura
-├── Raquete.java      # Modelagem das raquetes do jogador e do computador
-├── Bola.java         # Modelagem da bola, movimentacao, progressao de velocidade e saque
-├── Placar.java       # Controle encapsulado da pontuacao da partida
-└── README.md         # Documentacao do projeto
+├── Main.java              # Inicializacao da aplicacao na thread de eventos do Swing
+├── JanelaJogo.java        # Configuracao do JFrame e empacotamento do painel
+├── CampoJogo.java         # Loop principal, eventos de teclado, IA, colisoes e pintura
+├── Raquete.java           # Modelagem das raquetes do jogador e do computador
+├── Bola.java              # Modelagem da bola, movimentacao, progressao de velocidade e saque
+├── Placar.java            # Controle encapsulado da pontuacao da partida
+├── TesteJogo.java         # Suite de testes unitarios/funcionais das classes do jogo
+├── executar_testes.sh     # Script automatizado para compilar e rodar os testes
+└── README.md              # Documentacao do projeto
 ```
