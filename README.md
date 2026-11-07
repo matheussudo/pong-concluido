@@ -25,21 +25,23 @@ Principais conceitos aplicados:
 | `JanelaJogo` | Configura a janela principal (`JFrame`), define tamanho fixo (`setResizable(false)`) e adiciona o painel do jogo. |
 | `CampoJogo` | Coordena o estado da partida, captura os eventos de teclado, executa o loop principal (`Timer`), trata colisoes e renderiza os elementos em `paintComponent`. |
 | `Raquete` | Modela o estado e o comportamento das raquetes (jogador e CPU), encapsulando posicao, dimensoes, velocidade, limites verticais e area de colisao. |
-| `Bola` | Controla coordenadas, deslocamento horizontal/vertical, inversao de direcao em rebotes e reposicionamento centralizado apos cada ponto. |
+| `Bola` | Controla coordenadas, deslocamento horizontal/vertical, progressao gradual de velocidade a cada rebote, inversao de direcao e reposicionamento centralizado apos cada ponto. |
 | `Placar` | Gerencia a pontuacao do jogador e do computador de forma isolada, fornecendo metodos para contabilizar pontos e reiniciar a contagem. |
 
 ---
 
 ## Funcionalidades e Mecanicas
 
-### 1. Selecao de Dificuldade
-Ao iniciar o jogo (ou ao comecar uma nova partida), uma caixa de dialogo permite selecionar entre tres niveis de dificuldade que alteram o comportamento da inteligencia artificial (CPU) e a dinamica da partida:
+### 1. Selecao de Dificuldade e Aumento Gradual de Velocidade
+Ao iniciar o jogo (ou ao comecar uma nova partida), uma caixa de dialogo permite selecionar entre tres niveis de dificuldade. Cada nivel define tanto a precisao/velocidade da inteligencia artificial (CPU) quanto a **velocidade com que a bola acelera durante a troca de rebotes**:
 
-| Nivel | Velocidade da CPU | Tolerancia de Alinhamento | Velocidade Base da Bola |
-| :--- | :---: | :---: | :---: |
-| **Facil** | 3 px/ciclo | 25 px | 5 px/ciclo |
-| **Medio** | 4 px/ciclo | 16 px | 6 px/ciclo |
-| **Dificil** | 6 px/ciclo | 8 px | 7 px/ciclo |
+| Nivel | Velocidade da CPU | Tolerancia da CPU | Velocidade Inicial da Bola | Aceleracao da Bola | Velocidade Maxima |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Facil** | 3 px/ciclo | 25 px | 4 px/ciclo | Aumenta a cada **6 rebotes** | 10 px/ciclo |
+| **Medio** | 4 px/ciclo | 16 px | 5 px/ciclo | Aumenta a cada **3 rebotes** | 12 px/ciclo |
+| **Dificil** | 6 px/ciclo | 8 px | 6 px/ciclo | Aumenta a cada **1 rebote** | 15 px/ciclo |
+
+Quando um ponto e marcado, a bola retorna ao centro do campo com a velocidade inicial de saque do nivel selecionado.
 
 ### 2. Inteligencia Artificial da CPU
 A raquete do computador acompanha a bola comparando o centro vertical da bola com o seu proprio centro vertical. Para evitar oscilacoes visuais (tremores quando a bola esta alinhada), foi implementada uma faixa de tolerancia em pixels dentro da qual a raquete permanece estavel.
@@ -47,11 +49,12 @@ A raquete do computador acompanha a bola comparando o centro vertical da bola co
 ### 3. Sistema de Colisoes
 As colisoes entre a bola e as raquetes utilizam intersecao de retangulos (`java.awt.Rectangle.intersects`). Para evitar que a bola fique presa dentro da raquete ou sofra multiplos rebotes em um unico contato:
 - Verifica-se o sinal da velocidade horizontal antes de inverter a direcao;
-- A bola e reposicionada imediatamente na borda externa da raquete apos o impacto.
+- A bola e reposicionada imediatamente na borda externa da raquete apos o impacto;
+- O rebote e contabilizado pelo metodo `registrarReboteEAcelerar()` para aplicar a progressao de velocidade correspondente ao nivel de dificuldade.
 
 ### 4. Pontuacao, Condicao de Vitoria e Reinicio
 - Sempre que a bola ultrapassa completamente a borda esquerda, o computador marca 1 ponto; ao ultrapassar a borda direita, o jogador marca 1 ponto.
-- Apos cada ponto, a bola retorna ao centro do campo e realiza o saque na direcao oposta.
+- Apos cada ponto, a bola retorna ao centro do campo, restaura a velocidade base de saque e sai na direcao oposta.
 - A partida encerra quando um dos participantes atinge **10 pontos**. O `Timer` e interrompido, o vencedor e exibido na tela e o jogador pode iniciar uma nova partida sem duplicar timers em memoria.
 
 ---
@@ -101,7 +104,7 @@ java Main
 ├── JanelaJogo.java   # Configuracao do JFrame e empacotamento do painel
 ├── CampoJogo.java    # Loop principal, eventos de teclado, IA, colisoes e pintura
 ├── Raquete.java      # Modelagem das raquetes do jogador e do computador
-├── Bola.java         # Modelagem da bola, movimentacao e saque
+├── Bola.java         # Modelagem da bola, movimentacao, progressao de velocidade e saque
 ├── Placar.java       # Controle encapsulado da pontuacao da partida
 └── README.md         # Documentacao do projeto
 ```

@@ -124,23 +124,23 @@ public class CampoJogo extends JPanel {
         opcoes[1]);
 
     if (escolha == 0) {
-      // Facil: CPU mais lenta e maior margem de tolerancia
+      // Facil: demora bastante para aumentar a velocidade (a cada 6 rebotes)
       this.nivel_dificuldade = "Fácil";
       this.raquetecpu.setVelocidade(3);
       this.tolerancia_cpu = 25;
-      this.bola.setVelocidadeBase(5);
+      this.bola.configurarProgressaoVelocidade(4, 6, 10);
     } else if (escolha == 2) {
-      // Dificil: CPU rapida, menor tolerancia e bola mais veloz
+      // Dificil: aumenta a velocidade muito rapido (a cada 1 rebote na raquete)
       this.nivel_dificuldade = "Difícil";
       this.raquetecpu.setVelocidade(6);
       this.tolerancia_cpu = 8;
-      this.bola.setVelocidadeBase(7);
+      this.bola.configurarProgressaoVelocidade(6, 1, 15);
     } else {
-      // Medio (padrao caso feche o dialogo ou selecione Medio)
+      // Medio: aumenta a velocidade gradualmente (a cada 3 rebotes)
       this.nivel_dificuldade = "Médio";
       this.raquetecpu.setVelocidade(4);
       this.tolerancia_cpu = 16;
-      this.bola.setVelocidadeBase(6);
+      this.bola.configurarProgressaoVelocidade(5, 3, 12);
     }
 
     System.out.println("Dificuldade selecionada: " + this.nivel_dificuldade);
@@ -212,12 +212,14 @@ public class CampoJogo extends JPanel {
     if (this.bola.getVelocidadeX() < 0 && area_bola.intersects(area_player)) {
       this.bola.setX(this.raqueteplayer.getX() + this.raqueteplayer.getLargura());
       this.bola.inverterVelocidadeX();
+      this.bola.registrarReboteEAcelerar();
     }
 
     // Rebote na raquete da CPU (direita): apenas quando a bola se move para a direita
     if (this.bola.getVelocidadeX() > 0 && area_bola.intersects(area_cpu)) {
       this.bola.setX(this.raquetecpu.getX() - this.bola.getDiametro());
       this.bola.inverterVelocidadeX();
+      this.bola.registrarReboteEAcelerar();
     }
   }
 
@@ -310,12 +312,14 @@ public class CampoJogo extends JPanel {
     g.drawString(String.valueOf(this.placar.getPontosJogador()), (LARGURA / 2) - 80, 50);
     g.drawString(String.valueOf(this.placar.getPontosCpu()), (LARGURA / 2) + 55, 50);
 
-    // Indicador da dificuldade atual no topo
+    // Indicador da dificuldade e velocidade atual da bola na parte inferior
     g.setFont(new Font("SansSerif", Font.PLAIN, 14));
-    String texto_dificuldade = "Dificuldade: " + this.nivel_dificuldade + " | Meta: " + PONTOS_VITORIA + " pts";
+    String texto_status = "Dificuldade: " + this.nivel_dificuldade
+        + " | Velocidade da Bola: " + this.bola.getVelocidadeAtual()
+        + " | Meta: " + PONTOS_VITORIA + " pts";
     FontMetrics fm = g.getFontMetrics();
-    int x_texto = (LARGURA - fm.stringWidth(texto_dificuldade)) / 2;
-    g.drawString(texto_dificuldade, x_texto, ALTURA - 15);
+    int x_texto = (LARGURA - fm.stringWidth(texto_status)) / 2;
+    g.drawString(texto_status, x_texto, ALTURA - 15);
 
     // Raquete do Jogador
     g.fillRect(raqueteplayer.getX(), raqueteplayer.getY(), raqueteplayer.getLargura(), raqueteplayer.getAltura());
